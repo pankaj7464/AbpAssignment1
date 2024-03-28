@@ -21,6 +21,7 @@ public static class EMSEfCoreEntityExtensionMappings
             ObjectExtensionManager.Instance.MapEfCoreProperty<IdentityUser, Guid?>("DepartmentId", 
                 (entityBuilder, propertyBuilder) => { propertyBuilder.HasMaxLength(128);
                     propertyBuilder.IsRequired(false);
+
                 });
 
             /* You can configure extra properties for the

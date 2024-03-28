@@ -26,10 +26,14 @@ namespace EMS.OpenIddict
                 await _identityRoleManager.CreateAsync(new IdentityRole(Guid.NewGuid(), "HR"));
             }
 
+            hrRole = await _identityRoleManager.FindByNameAsync("HR");
+
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.Create, true);
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.Edit, true);
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.Delete, true);
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.View, true);
+
+
 
         }
     }

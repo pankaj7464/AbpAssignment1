@@ -16,6 +16,8 @@ public static class EMSModuleExtensionConfigurator
             ConfigureExistingProperties();
             ConfigureExtraProperties();
         });
+
+
     }
 
     private static void ConfigureExistingProperties()

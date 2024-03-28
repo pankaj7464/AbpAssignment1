@@ -1,6 +1,6 @@
 ﻿namespace EMS.Services
 {
-    public class CreateIdentityUserDto
+    public class CreateEmployeeDto
     {
     }
 }
