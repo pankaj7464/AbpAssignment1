@@ -1,4 +1,4 @@
-﻿namespace EMS.Services.Employee
+﻿namespace EMS.Services
 {
     public class EmployeeDto
     {

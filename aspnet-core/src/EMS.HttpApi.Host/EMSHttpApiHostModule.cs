@@ -68,8 +68,28 @@ public class EMSHttpApiHostModule : AbpModule
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
+        context.Services.AddAuthorization(options =>
+        {
+
+            options.AddPolicy("admin",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("Admin");
+                });
+            options.AddPolicy("hr",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("HR");
+                });
+            options.AddPolicy("employee",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("employee");
+                });
+
+        });
+
         ConfigureAuthentication(context);
-        ConfigurePolicies(context);
         ConfigureBundles();
         ConfigureUrls(configuration);
         ConfigureConventionalControllers();
@@ -80,96 +100,12 @@ public class EMSHttpApiHostModule : AbpModule
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
-        var configuration = context.Services.GetConfiguration();
-
-        //// Retrieve the JWT signing key from your configuration.
-        var jwtKey = configuration["ApiAccessToken:ApiAccessTokenKey"];
-        var issuer = configuration["ApiAccessToken:ApiAccessTokenIssuer"];
-        var audience = configuration["ApiAccessToken:ApiAccessTokenAudience"];
-
-        context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false; // In a production environment, this should be true.
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    // Configure the key used to validate the token's signature.
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(jwtKey)),
-                    ValidateIssuer = true,
-                    ValidIssuer = issuer, // Replace with the actual issuer.
-                    ValidateAudience = true,
-                    ValidAudience = audience, // Replace with the actual audience.
-                    ValidateLifetime = true,
-                    RoleClaimType = ClaimTypes.Role
-                };
-            });
-    }
-    private void ConfigurePolicies(ServiceConfigurationContext context)
-    {
-        context.Services.AddAuthorization(options =>
+        context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+        context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
         {
-            // User module policies
-            options.AddPolicy(EMSPermissions.Admin.Default, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-            options.AddPolicy(EMSPermissions.Admin.Create, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-            options.AddPolicy(EMSPermissions.Admin.Edit, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-            options.AddPolicy(EMSPermissions.Admin.Delete, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-
-            // Hr module policies
-            options.AddPolicy(EMSPermissions.Hr.Default, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-            options.AddPolicy(EMSPermissions.Hr.Create, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-            options.AddPolicy(EMSPermissions.Hr.Edit, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-            options.AddPolicy(EMSPermissions.Hr.Delete, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Admin");
-            });
-
-
-            // Employee module policies
-            options.AddPolicy(EMSPermissions.Employee.Default, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Hr");
-            });
-            options.AddPolicy(EMSPermissions.Employee.Create, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Hr");
-            });
-            options.AddPolicy(EMSPermissions.Employee.Edit, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Hr");
-            });
-            options.AddPolicy(EMSPermissions.Employee.Delete, policy =>
-            {
-                policy.RequireClaim(ClaimTypes.Role, "Hr");
-            });
-
-
-
-
+            options.IsDynamicClaimsEnabled = true;
         });
-
     }
-
     private void ConfigureBundles()
     {
         Configure<AbpBundlingOptions>(options =>
@@ -286,7 +222,6 @@ public class EMSHttpApiHostModule : AbpModule
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
-        app.UseAbpOpenIddictValidation();
 
         if (MultiTenancyConsts.IsEnabled)
         {

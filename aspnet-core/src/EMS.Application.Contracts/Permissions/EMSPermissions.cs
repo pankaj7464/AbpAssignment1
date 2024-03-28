@@ -8,6 +8,8 @@ public static class EMSPermissions
     //Add your own permission names. Example:
     //public const string MyPermission1 = GroupName + ".MyPermission1";
 
+    //public const string HrPermission = GroupName + ".HR";
+
 
     public static class Admin
     {
@@ -18,16 +20,19 @@ public static class EMSPermissions
     }
     public static class Hr
     {
-        public const string Default = GroupName + ".Hr";
+        public const string Default = GroupName + ".HR";
         public const string Create = Default + ".Create";
         public const string Edit = Default + ".Edit";
         public const string Delete = Default + ".Delete";
     }
+
     public static class Employee
     {
         public const string Default = GroupName + ".Employee";
         public const string Create = Default + ".Create";
         public const string Edit = Default + ".Edit";
         public const string Delete = Default + ".Delete";
+        public const string View = Default + ".View";
     }
+
 }

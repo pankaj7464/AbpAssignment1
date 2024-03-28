@@ -30,10 +30,12 @@ namespace EMS;
     typeof(AbpTenantManagementDomainModule),
     typeof(AbpEmailingModule)
 )]
+
 public class EMSDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Languages.Add(new LanguageInfo("ar", "ar", "العربية", "ae"));

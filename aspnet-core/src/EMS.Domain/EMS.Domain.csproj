@@ -9,15 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EMS.Application.Contracts\EMS.Application.Contracts.csproj" />
     <ProjectReference Include="..\EMS.Domain.Shared\EMS.Domain.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Emailing" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.Identity.Domain" Version="8.0.5" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="8.0.5" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="8.0.5" />
     <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="8.0.5" />
