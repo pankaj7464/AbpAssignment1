@@ -38,8 +38,6 @@ namespace EMS.Services
             _roleRepository = roleRepository;
             _roleManager = roleManager;
         }
-
-
         [Authorize(Roles ="admin")]
         public async  Task<IdentityUserDto> humanResource(ApplicationUserDto input)
         {
@@ -52,22 +50,14 @@ namespace EMS.Services
             switch (currentUserRole.ToLower())
             {
                 case "admin":
-
                     // Create user with "hr" role.
                     return await CreateUserWithRoleAsync(input, "HR");
-                case "hr":
-                    // Create user with "employee" role.
-              
-                    return await CreateUserWithRoleAsync(input, "employee");
                 default:
                     // Handle unknown roles.
                     throw new AbpException("Unknown role");
             }
 
         }
-
-
-
 
         [Authorize(Roles = "HR")]
         public async Task<IdentityUserDto> CreateEmployee(ApplicationUserDto input)
@@ -125,7 +115,9 @@ namespace EMS.Services
         [Authorize(Roles = "HR")]
         public async Task<ListResultDto<IdentityUserDto>> GetEmployees()
         {
-            var users = await _userManager.GetUsersInRoleAsync("HR");
+            var user = _currentUser;
+
+            var users = await _userManager.GetUsersInRoleAsync("employee");
             var userDtos = ObjectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>((List<IdentityUser>)users);
             return new ListResultDto<IdentityUserDto>(userDtos);
         }
@@ -135,6 +127,7 @@ namespace EMS.Services
         [Authorize(Roles = "HR")]
         public async Task<ListResultDto<IdentityUserDto>> SearchEmployeesByName(string name)
         {
+           
             var users = await _userManager.GetUsersInRoleAsync("HR");
             var filteredUsers = users.Where(u => u.UserName.Contains(name)).ToList();
             var userDtos = ObjectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>(filteredUsers);
