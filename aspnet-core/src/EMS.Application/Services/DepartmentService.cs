@@ -10,11 +10,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace EMS.Services
 {
-    [Authorize(Roles ="admin")]
+    [Authorize]
     public class DepartmentService : CrudAppService<Department, DepartmentDto, Guid, PagedAndSortedResultRequestDto, DepartmentCreateUpdateDto, DepartmentCreateUpdateDto>, IDepartmentService
     {
-
-        
         public DepartmentService(IRepository<Department, Guid> repository) : base(repository)
         {
        
