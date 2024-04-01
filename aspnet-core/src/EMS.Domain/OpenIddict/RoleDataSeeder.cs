@@ -32,9 +32,6 @@ namespace EMS.OpenIddict
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.Edit, true);
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.Delete, true);
             await _permissionManager.SetForRoleAsync(hrRole.Name, EMSPermissions.Employee.View, true);
-
-
-
         }
     }
 }
