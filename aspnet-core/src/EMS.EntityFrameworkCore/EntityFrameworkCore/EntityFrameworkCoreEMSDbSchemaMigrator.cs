@@ -26,7 +26,7 @@ public class EntityFrameworkCoreEMSDbSchemaMigrator
          * current scope.
          */
 
-        await _serviceProvider
+        await _serviceProvider      
             .GetRequiredService<EMSDbContext>()
             .Database
             .MigrateAsync();

@@ -19,7 +19,7 @@ namespace EMS.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.SqlServer)
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -783,7 +783,6 @@ namespace EMS.Migrations
                         .HasColumnName("DeletionTime");
 
                     b.Property<Guid?>("DepartmentId")
-                        .HasMaxLength(128)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
@@ -906,6 +905,8 @@ namespace EMS.Migrations
                         .HasColumnName("UserName");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("Email");
 
@@ -1848,6 +1849,13 @@ namespace EMS.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Volo.Abp.Identity.IdentityUser", b =>
+                {
+                    b.HasOne("EMS.Departments.Department", null)
+                        .WithMany()
+                        .HasForeignKey("DepartmentId");
                 });
 
             modelBuilder.Entity("Volo.Abp.Identity.IdentityUserClaim", b =>

@@ -82,6 +82,13 @@ public class EMSDbContext :
 
         /* Configure your own tables/entities inside here */
 
+        builder.Entity<IdentityUser>(b =>
+        {
+            b.HasOne<Department>()
+                .WithMany()
+                .HasForeignKey("DepartmentId")
+                .IsRequired(false); 
+        });
         builder.Entity<Department>(option =>
         {
             option.ConfigureByConvention();

@@ -17,12 +17,20 @@ public static class EMSEfCoreEntityExtensionMappings
 
         OneTimeRunner.Run(() =>
         {
-
-            ObjectExtensionManager.Instance.MapEfCoreProperty<IdentityUser, Guid?>("DepartmentId", 
-                (entityBuilder, propertyBuilder) => { propertyBuilder.HasMaxLength(128);
-                    propertyBuilder.IsRequired(false);
-
+            ObjectExtensionManager.Instance
+            .Modules()
+            .ConfigureIdentity(identity =>
+            {
+                identity.ConfigureUser(user =>
+                {
+                    user.AddOrUpdateProperty<Guid?>("DepartmentId");
                 });
+            });
+            ObjectExtensionManager.Instance
+            .MapEfCoreProperty<IdentityUser, Guid?>("DepartmentId");
+
+            
+
 
             /* You can configure extra properties for the
              * entities defined in the modules used by your application.

@@ -17,6 +17,7 @@ public static class EMSPermissions
         public const string Create = Default + ".Create";
         public const string Edit = Default + ".Edit";
         public const string Delete = Default + ".Delete";
+        public const string View = Default + ".View";
     }
     public static class Hr
     {
@@ -24,6 +25,7 @@ public static class EMSPermissions
         public const string Create = Default + ".Create";
         public const string Edit = Default + ".Edit";
         public const string Delete = Default + ".Delete";
+        public const string View = Default + ".View";
     }
 
     public static class Employee

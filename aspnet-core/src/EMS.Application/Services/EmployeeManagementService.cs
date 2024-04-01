@@ -1,4 +1,5 @@
-﻿using EMS.DTOs;
+﻿
+using EMS.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -8,63 +9,78 @@ using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
+using Volo.Abp.ObjectMapping;
 using Volo.Abp.Users;
+using static Volo.Abp.Identity.IdentityPermissions;
 
 namespace EMS.Services
 {
-    public class EmployeeManagementService : IdentityUserAppService, ITransientDependency
+    public class EmployeeManagementService : IApplicationService, ITransientDependency
     {
         private readonly ICurrentUser _currentUser;
         private readonly IdentityUserManager _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-
+        private readonly IObjectMapper _objectMapper;
+        private readonly UserManager<IdentityUser> _userRepository;
         IIdentityRoleRepository _roleRepository;
 
         public EmployeeManagementService(
             IdentityUserManager userManager,
-            IIdentityUserRepository userRepository,
             IIdentityRoleRepository roleRepository,
-            IOptions<IdentityOptions> identityOptions,
             RoleManager<IdentityRole> roleManager,
-
+            UserManager<IdentityUser> userRepository,
             ICurrentUser currentUser)
-            : base(userManager, userRepository, roleRepository, identityOptions)
+        
         {
             _userManager = userManager;
             _currentUser = currentUser;
             _roleRepository = roleRepository;
+            _userRepository = userRepository;
             _roleManager = roleManager;
         }
         [Authorize(Roles ="admin")]
-        public async  Task<IdentityUserDto> humanResource(ApplicationUserDto input)
-        {
-            // Determine the current user's role (e.g., "admin" or "hr").
-
-            string currentUserRole = _currentUser.Roles.FirstOrDefault();
-            // You need to implement this method.
-
-            // Create the user based on the current user's role.
-            switch (currentUserRole.ToLower())
-            {
-                case "admin":
-                    // Create user with "hr" role.
-                    return await CreateUserWithRoleAsync(input, "HR");
-                default:
-                    // Handle unknown roles.
-                    throw new AbpException("Unknown role");
-            }
-
-        }
-
-        [Authorize(Roles = "HR")]
-        public async Task<IdentityUserDto> CreateEmployee(ApplicationUserDto input)
+        public async  Task<string> humanResource(ApplicationUserDto input)
         {
             // Create the user with the specified role.
             var user = new IdentityUser(Guid.NewGuid(), input.UserName, input.Email, input.DepartmentId);
+            var role = await _roleManager.FindByNameAsync("HR");
 
+            user.SetProperty("DepartmentId", input.DepartmentId);
+            user.AddRole(role.Id);
+
+            var result = await _userManager.CreateAsync(user, input.Password);
+
+            if (!result.Succeeded)
+            {
+                throw new AbpException(result.Errors.First().Description);
+            }
+
+            return "HR Created successully";
+
+        }
+
+        [Authorize(Roles= "admin")]
+        public async Task<string> getAllhr()
+        {
+            // Create the user with the specified role.
+       
+            var users = await _userRepository.FindByEmailAsync("user@gmail.com");
+
+            return "Fetch hr successfull";
+
+        }
+        [Authorize(Roles = "HR")]
+        public async Task<IdentityUserDto> CreateEmployee(ApplicationUserDto input)
+        {
+            //Ensure only add employee in own department
+
+
+            // Create the user with the specified role.
+            var user = new IdentityUser(Guid.NewGuid(), input.UserName, input.Email, input.DepartmentId);
             var role = await _roleManager.FindByNameAsync("employee");
             user.SetProperty("DepartmentId", input.DepartmentId);
             user.AddRole(role.Id);
@@ -76,7 +92,7 @@ namespace EMS.Services
                 throw new AbpException(result.Errors.First().Description);
             }
 
-            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
+            return _objectMapper.Map<IdentityUser,IdentityUserDto>(user);
         }
 
 
@@ -92,7 +108,7 @@ namespace EMS.Services
                 throw new AbpException(result.Errors.First().Description);
             }
 
-            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
+            return _objectMapper.Map<IdentityUser, IdentityUserDto>(user);
         }
 
         [Authorize(Roles = "HR")]
@@ -109,7 +125,7 @@ namespace EMS.Services
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
 
-            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
+            return _objectMapper.Map<IdentityUser, IdentityUserDto>(user);
         }
 
         [Authorize(Roles = "HR")]
@@ -118,7 +134,7 @@ namespace EMS.Services
             var user = _currentUser;
 
             var users = await _userManager.GetUsersInRoleAsync("employee");
-            var userDtos = ObjectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>((List<IdentityUser>)users);
+            var userDtos = _objectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>((List<IdentityUser>)users);
             return new ListResultDto<IdentityUserDto>(userDtos);
         }
 
@@ -130,28 +146,10 @@ namespace EMS.Services
            
             var users = await _userManager.GetUsersInRoleAsync("HR");
             var filteredUsers = users.Where(u => u.UserName.Contains(name)).ToList();
-            var userDtos = ObjectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>(filteredUsers);
+            var userDtos = _objectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>(filteredUsers);
             return new ListResultDto<IdentityUserDto>(userDtos);
         }
-        private async Task<IdentityUserDto> CreateUserWithRoleAsync(ApplicationUserDto input, string roleName)
-        {
-            // Create the user with the specified role.
-            var user = new IdentityUser(Guid.NewGuid(),input.UserName,input.Email, input.DepartmentId );
-
-            var role = await _roleManager.FindByNameAsync(roleName);
-            user.SetProperty("DepartmentId", input.DepartmentId);
-            user.AddRole(role.Id); 
-
-            var result = await _userManager.CreateAsync(user, input.Password);
-
-            if (!result.Succeeded)
-            {
-                throw new AbpException(result.Errors.First().Description);
-            }
-
-            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
-        }
-
+        
 
     }
 }
