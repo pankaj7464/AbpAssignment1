@@ -15,7 +15,6 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Users;
-using static Volo.Abp.Identity.IdentityPermissions;
 
 namespace EMS.Services
 {
@@ -48,6 +47,7 @@ namespace EMS.Services
             // Create the user with the specified role.
             var user = new IdentityUser(Guid.NewGuid(), input.UserName, input.Email, input.DepartmentId);
             var role = await _roleManager.FindByNameAsync("HR");
+
 
             user.SetProperty("DepartmentId", input.DepartmentId);
             user.AddRole(role.Id);

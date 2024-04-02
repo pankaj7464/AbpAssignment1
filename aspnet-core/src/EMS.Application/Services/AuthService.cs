@@ -15,6 +15,8 @@ using EMS.Permissions;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using EMS.DTOs;
+using EMS.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace EMS.Services
 {
@@ -26,16 +28,19 @@ namespace EMS.Services
         private readonly IConfiguration _config;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IRepository<IdentityUser> _userRepository;
+        private readonly EMSDbContext _context;
         public string PasswordlessLoginUrl { get; set; }
         public AuthService(
             UserManager<IdentityUser> userManager,
             IRepository<IdentityUser> userRepository,
+            EMSDbContext eMSDbContext,
         IRepository<Volo.Abp.Identity.IdentityUser, Guid> userRepositoy,
             IConfiguration config,
          
             ICurrentUser currentUser)
         {
-        
+
+            _context = eMSDbContext;
             _userRepository = userRepository;
             _currentUser = currentUser;
             _userManager = userManager;
@@ -55,8 +60,9 @@ namespace EMS.Services
         /// </returns>
         public async Task<LoginResponse> Login(LoginModel model)
         {
-
-           var user =await _userRepository.FirstOrDefaultAsync(user=>user.Email == model.Email);
+           //var user =await _userRepository.FirstOrDefaultAsync(user=>user.Email == model.Email);
+            var user =await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            var users = await _context.Users.ToListAsync();
             var isValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (user != null && isValid)
             {

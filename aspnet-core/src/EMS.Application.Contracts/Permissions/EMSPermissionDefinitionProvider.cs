@@ -11,6 +11,7 @@ public class EMSPermissionDefinitionProvider : PermissionDefinitionProvider
         var employeeManagementGroup = context.AddGroup("EmployeeManagement");
         var hrPermission = employeeManagementGroup.AddPermission("HR", L("Permission:HR"));
         var adminPermission = employeeManagementGroup.AddPermission("Admin", L("Permission:Admin"));
+
     }
 
     private static LocalizableString L(string name)

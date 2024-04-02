@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EMS.Domain\EMS.Domain.csproj" />
     <ProjectReference Include="..\EMS.Application.Contracts\EMS.Application.Contracts.csproj" />
+    <ProjectReference Include="..\EMS.EntityFrameworkCore\EMS.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
